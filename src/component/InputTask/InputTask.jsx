@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./InputTask.css";
+// import "./InputTask.css";
 import InputForm from "../InputForm/inputForm";
 import Card from "../Cards/card";
 import SingleTask from "../singleTask/singleTask";
@@ -100,7 +100,7 @@ const InputTask = () => {
 
   return (
     <>
-      <div className="inputWrapper ">
+      <div className="w-full h-auto flex justify-center items-center self-center">
         {path === "addTask" && (
           <InputForm
             Submit={submitHandler}
@@ -111,8 +111,9 @@ const InputTask = () => {
           />
         )}
         {path === "view" && (
-          <div className="cardWrapper">
-            <button className="btn btn-warning mb-3 w-100" onClick={AddTask}>
+          <div className="gap-2.5 w-full">
+            <button className="px-4 py-2 bg-yellow-500 text-white rounded-md mb-3 w-full hover:bg-yellow-600 transition"
+                onClick={AddTask}>
               Add Task
             </button>
             {todo.map((t) => {

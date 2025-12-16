@@ -1,13 +1,14 @@
 import React from "react";
 
-const EditForm = ({task, onSubmit, editTime, onClick }) => {
+const EditForm = ({ task, onSubmit, editTime, onClick }) => {
   return (
     <div>
-      <form onSubmit={onSubmit} className="inputForm">
-        <div className="col-auto">
+      <form onSubmit={onSubmit} className="">
+        <div className="flex-none w-auto">
           <input
             type="number"
-            className="form-control numberInput mb-3 border-0 border-bottom bg-transparent text-white"
+            className="w-full mb-3 bg-transparent text-white border-0 border-b border-gray-400 
+            outline-none focus:border-b-2 focus:border-yellow-400"
             max={25}
             onChange={editTime}
             id="validationTooltip01"
@@ -17,8 +18,9 @@ const EditForm = ({task, onSubmit, editTime, onClick }) => {
         </div>
         <button
           type="submit"
-          onClick={()=>onClick(task.id)}
-          className="btn btn-primary mt-3 w-100"
+          onClick={() => onClick(task.id)}
+          className="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white 
+          px-4 py-2 rounded transition"
         >
           Submit
         </button>

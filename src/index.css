@@ -1,8 +1,9 @@
+@import "tailwindcss";
 body {
     background-color: #1f2241;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif ;
 }
-.btn-primary{
+/* .btn-primary{
     background-color: white;
     color: #1f2241;
    backdrop-filter: drop-shadow(4px 4px 10px blue);
@@ -14,4 +15,4 @@ body {
     background-color: transparent;
     color: white;
     
-}
+} */

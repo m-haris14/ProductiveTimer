@@ -1,17 +1,20 @@
 import InputTask from "../InputTask/InputTask";
-import "./pomodoro.css";
 
 const Pomodoro = () => {
   return (
-    <>
-      <div className="HeaderWrapper">
-        <div className="Header">
-          <h1 className="title text-white fs-1 fw-bold">Pomodoro Timer</h1>
-          <p className="card-text text-white text-center my-3">Create Tasks & Specify time for them !</p>
-          <InputTask />
-        </div>
+    <div className="flex justify-center items-center h-screen">
+      <div className="w-1/4">
+        <h1 className="text-center text-white text-5xl font-bold">
+          Pomodoro Timer
+        </h1>
+
+        <p className="text-white text-center my-3">
+          Create Tasks & Specify time for them !
+        </p>
+
+        <InputTask />
       </div>
-    </>
+    </div>
   );
 };
 
