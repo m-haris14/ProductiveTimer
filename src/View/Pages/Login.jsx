@@ -3,6 +3,8 @@ import React from "react";
 const Login = () => {
   return (
       <div className="min-h-screen w-full gap-1 flex flex-col items-center justify-center bg-[#1b1f3a]">
+        <h1>yugffgjgfug</h1>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non, qui.</p>
         <p className="text-6xl font-bold text-white text-center ">
           Ten Bit Solutions
         </p>
