@@ -3,9 +3,6 @@ import React from "react";
 const Login = () => {
   return (
       <div className="min-h-screen w-full gap-1 flex flex-col items-center justify-center bg-[#1b1f3a]">
-        <h1>yugffgjgfug</h1>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non, qui.</p>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet, velit.</p>
         <p className="text-6xl font-bold text-white text-center ">
           Ten Bit Solutions
         </p>
@@ -52,7 +49,7 @@ const Login = () => {
               w-full py-3 rounded-xl font-semibold text-white text-xl cursor-pointer
               bg-[linear-gradient(90deg,#3b82f6,#7c3aed)]
               hover:bg-[linear-gradient(90deg,#2563eb,#6d28d9)]
-              transition-all duration-300
+              transition-all duration-400
               shadow-lg 
             "
             >
