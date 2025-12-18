@@ -1,21 +1,23 @@
-import React from 'react'
-import Sidebar from './Sidebar/Sidebar'
-import Header from './Header/Header'
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar/Sidebar";
+import Header from "./Header/Header";
 
-const Layout = ({children}) => {
+const Layout = () => {
   return (
-    <div className='flex'>
-      <div className='w-[25%]'>
-        <Sidebar/>
+    <div className="flex h-screen bg-[#141843]">
+      <div className="w-[25%]">
+        <Sidebar />
       </div>
-      <div className='w-full'>
-      
-      <Header/>      
-      
-      <div>{children}</div>
-      </div>
-      </div>
-  )
-}
 
-export default Layout
+      <div className="w-full flex flex-col">
+        <Header />
+        <div className="p-6 flex-1 overflow-auto">
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Layout;

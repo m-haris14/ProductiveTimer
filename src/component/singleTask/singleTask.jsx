@@ -1,4 +1,3 @@
-import "./singleTask.css";
 import Buttons from "./buttons";
 import EditForm from "../InputForm/editForm";
 import Clock from "./clock";

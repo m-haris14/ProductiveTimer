@@ -2,18 +2,9 @@ import React from "react";
 
 const Dashboard = () => {
   return (
-    <div className="h-screen flex text-white bg-[radial-gradient(circle_at_top,#1b1f4a,#050718)]">
-
-      {/* MAIN AREA */}
-      <div className="flex-1 p-6">
-
-        
-        
-
-        {/* TOP CARDS */}
+    <div className="h-screen flex text-white">
+      <div className="flex-1">
         <div className="grid grid-cols-2 gap-6">
-
-          {/* TIMER CARD */}
           <div className="bg-[#141843] rounded-2xl p-6 shadow-[0_0_40px_rgba(90,169,255,0.35)]">
             <h2 className="text-lg mb-4">⏱ Timer</h2>
 
@@ -32,12 +23,10 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* STATS CARD */}
           <div className="bg-[#141843] rounded-2xl p-6 shadow-[0_0_40px_rgba(90,169,255,0.35)]">
             <h2 className="text-lg mb-6">Productivity Stats</h2>
 
             <div className="flex justify-around">
-              {/* TODAY */}
               <div className="text-center">
                 <svg width="120" height="120">
                   <circle cx="60" cy="60" r="50" stroke="#1e245c" strokeWidth="10" fill="none"/>
@@ -58,8 +47,6 @@ const Dashboard = () => {
                 </svg>
                 <p className="mt-2">Today</p>
               </div>
-
-              {/* WEEK */}
               <div className="text-center">
                 <svg width="120" height="120">
                   <circle cx="60" cy="60" r="50" stroke="#1e245c" strokeWidth="10" fill="none"/>
@@ -86,7 +73,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* TASK TABLE */}
         <div className="mt-6 bg-[#141843] rounded-2xl p-6 shadow-[0_0_40px_rgba(90,169,255,0.35)]">
           <h2 className="text-lg mb-4">Task Overview</h2>
 

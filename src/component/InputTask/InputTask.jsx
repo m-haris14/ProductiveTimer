@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// import "./InputTask.css";
 import InputForm from "../InputForm/inputForm";
 import Card from "../Cards/card";
 import SingleTask from "../singleTask/singleTask";
