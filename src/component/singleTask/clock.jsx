@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./clock.css";
+
 import StopWatch from "../StopWatch/stopWatch";
 const Clock = ({ timer }) => {
   const [isRunning, setIsRunning] = useState(false);
