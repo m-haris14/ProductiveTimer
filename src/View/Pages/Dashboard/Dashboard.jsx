@@ -29,7 +29,14 @@ const Dashboard = () => {
             <div className="flex justify-around">
               <div className="text-center">
                 <svg width="120" height="120">
-                  <circle cx="60" cy="60" r="50" stroke="#1e245c" strokeWidth="10" fill="none"/>
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    stroke="#1e245c"
+                    strokeWidth="10"
+                    fill="none"
+                  />
                   <circle
                     cx="60"
                     cy="60"
@@ -41,7 +48,14 @@ const Dashboard = () => {
                     strokeDashoffset="50"
                     strokeLinecap="round"
                   />
-                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="22">
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="white"
+                    fontSize="22"
+                  >
                     84
                   </text>
                 </svg>
@@ -49,7 +63,14 @@ const Dashboard = () => {
               </div>
               <div className="text-center">
                 <svg width="120" height="120">
-                  <circle cx="60" cy="60" r="50" stroke="#1e245c" strokeWidth="10" fill="none"/>
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    stroke="#1e245c"
+                    strokeWidth="10"
+                    fill="none"
+                  />
                   <circle
                     cx="60"
                     cy="60"
@@ -61,7 +82,14 @@ const Dashboard = () => {
                     strokeDashoffset="30"
                     strokeLinecap="round"
                   />
-                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="22">
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="white"
+                    fontSize="22"
+                  >
                     90
                   </text>
                 </svg>
@@ -74,15 +102,15 @@ const Dashboard = () => {
         </div>
 
         <div className="mt-6 bg-[#141843] rounded-2xl p-6 shadow-[0_0_40px_rgba(90,169,255,0.35)]">
-          <h2 className="text-lg mb-4">Task Overview</h2>
+          <h2 className="text-xl mb-4 ">Task Overview</h2>
 
           <table className="w-full text-sm">
             <thead className="opacity-60">
-              <tr>
-                <th className="text-left">Task</th>
+              <tr className="text-left text-lg">
+                <th>Task</th>
                 <th>Status</th>
                 <th>Time</th>
-                <th></th>
+                <th>View</th>
               </tr>
             </thead>
 
@@ -107,7 +135,6 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   );

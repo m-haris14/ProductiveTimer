@@ -24,14 +24,9 @@ const Sidebar = () => {
     { text: "Reports", icon: <RiFileList3Line size={20} />, path: "/reports" },
     { text: "Tasks", icon: <RiFileList3Line size={20} />, path: "/tasks" },
     {
-      text: "Attendance",
+      text: "Attendence",
       icon: <TfiAnnouncement size={20} />,
-      path: "/attendance",
-    },
-    {
-      text: "Login",
-      icon: <TfiAnnouncement size={20} />,
-      path: "/login",
+      path: "/attendence",
     },
     {
       text: "Settings",

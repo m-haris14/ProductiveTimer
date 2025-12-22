@@ -1,35 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    const result = await login(username, password);
+    if (result.success) {
+      navigate("/");
+    } else {
+      setError(result.message);
+    }
+  };
+
   return (
-      <div className="h-screen w-full gap-1 flex flex-col items-center justify-center bg-[#1b1f3a]">
-        <p className="text-6xl font-bold text-white text-center ">
-          Ten Bit Solutions
-        </p>
-        <p className="text-lg text-gray-300 text-center mb-9">
-          Employee Production Management System
-        </p>
-        <div
-          className="relative w-[33%] rounded-xl border border-gray-400 border-t-4
+    <div className="h-screen w-full gap-1 flex flex-col items-center justify-center bg-[#1b1f3a]">
+      <p className="text-6xl font-bold text-white text-center ">
+        Ten Bit Solutions
+      </p>
+      <p className="text-lg text-gray-300 text-center mb-9">
+        Employee Production Management System
+      </p>
+      <div
+        className="relative w-[33%] rounded-xl border border-gray-400 border-t-4
          
          shadow-[0_0_40px_rgba(99,102,241,0.4)]"
-        >
-          <div className="rounded-2xl bg-[#1b1f3a] px-8 py-8">
-            <h1 className="text-4xl font-bold text-white text-center">
-              Login
-            </h1>
-            <p className="text-gray-300 text-center text-lg mb-12">
+      >
+        <div className="rounded-2xl bg-[#1b1f3a] px-8 py-8">
+          <form onSubmit={handleLogin}>
+            <h1 className="text-4xl font-bold text-white text-center">Login</h1>
+            <p className="text-gray-300 text-center text-lg mb-6">
               Enter your account credentials to login
             </p>
+
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
             <div className="mb-2">
               <input
                 type="text"
-                placeholder="Enter Userame"
+                placeholder="Enter Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl
-                bg-[#232861 border-b-2 border-[#2f357a]
+                bg-[#232861] border-b-2 border-[#2f357a]
                 text-white placeholder-gray-400
-                focus: outline-none focus:border-blue-400"
+                focus:outline-none focus:border-blue-400"
               />
             </div>
 
@@ -37,10 +59,12 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="Enter Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl
-                bg-[#232861 border-b-2 border-[#2f357a]
+                bg-[#232861] border-b-2 border-[#2f357a]
                 text-white placeholder-gray-400
-                focus: outline-none focus:border-blue-400"
+                focus:outline-none focus:border-blue-400"
               />
             </div>
 
@@ -55,9 +79,10 @@ const Login = () => {
             >
               Login
             </button>
-          </div>
+          </form>
         </div>
       </div>
+    </div>
   );
 };
 
