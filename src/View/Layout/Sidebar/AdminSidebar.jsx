@@ -10,36 +10,22 @@ const AdminSidebar = () => {
   const location = useLocation();
 
   const menu = [
-    { text: "Admin Dashboard", icon: <MdOutlineDashboard size={18} />, path: "/" },
+    {
+      text: "Admin Dashboard",
+      icon: <MdOutlineDashboard size={18} />,
+      path: "/",
+    },
     {
       text: "Add Employee",
       icon: <IoPersonAddOutline size={18} />,
       path: "/register",
     },
-    {
-      text: "Pomodoro",
-      icon: <RiFileList3Line size={18} />,
-      path: "/pomodoro",
-    },
-    { text: "Reports", icon: <RiFileList3Line size={18} />, path: "/reports" },
-    { text: "Tasks", icon: <RiFileList3Line size={18} />, path: "/tasks" },
-    {
-      text: "Attendence",
-      icon: <TfiAnnouncement size={18} />,
-      path: "/attendence",
-    },
-    {
-      text: "Settings",
-      icon: <IoSettingsOutline size={18} />,
-      path: "/settings",
-    },
   ];
 
   return (
-    <div className="w-72 h-screen px-4 py-5 bg-[#f3f4f6] border-r border-gray-200">
-
+    <div className="w-full h-screen px-4 py-5 bg-[#f3f4f6] border-r border-gray-200">
       {/* Logo */}
-      <h1 className="text-xl flex items-center gap-2 font-bold text-[#2563eb] mb-6">
+      <h1 className="text-2xl flex items-center gap-2 font-bold text-[#2563eb] mb-6">
         <SiTimescale className="text-[#2563eb]" />
         Productive Timer
       </h1>
@@ -62,14 +48,12 @@ const AdminSidebar = () => {
             `}
           >
             <span
-              className={`${
-                isActive ? "text-[#2563eb]" : "text-gray-500"
-              }`}
+              className={`${isActive ? "text-[#2563eb]" : "text-gray-500"}`}
             >
               {item.icon}
             </span>
 
-            <span className="text-sm">{item.text}</span>
+            <span className="text-medium">{item.text}</span>
           </div>
         );
       })}

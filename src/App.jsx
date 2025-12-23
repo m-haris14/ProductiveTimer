@@ -1,85 +1,82 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+// App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import Pomodoro from "./component/Pomodoro/pomodoro";
+
+// Employee Pages
 import Dashboard from "./View/Pages/Dashboard/Dashboard";
-import Login from "./View/Pages/Login/Login";
-import Layout from "./View/Layout/Layout";
 import Task from "./View/Pages/Task/Task";
 import Reports from "./View/Pages/Report/Reports";
 import Attendence from "./View/Pages/Attendence/Attendence";
 import Settings from "./View/Pages/Setting/Settings";
-import Register from "./View/Pages/Register/Register";
-import AdminLayout from "./View/Layout/AdminLayout";
+
+// Admin Pages
 import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
+import Register from "./View/Pages/Register/Register";
 
-// Protected route waits until AuthContext finishes initialization
-const ProtectedRoute = ({ children }) => {
+// Auth Pages
+import Login from "./View/Pages/Login/Login";
+
+// Layouts
+import Layout from "./View/Layout/Layout";
+import AdminLayout from "./View/Layout/AdminLayout";
+
+// Common Components
+import Pomodoro from "./component/Pomodoro/pomodoro";
+
+// ====================== ROUTES INSIDE PROVIDER ======================
+function AppRoutes() {
   const { user, initialized } = useAuth();
 
-  if (!initialized) {
-    // Optional: show nothing or a spinner while checking localStorage
-    return null;
-  }
+  if (!initialized) return <div>Loading...</div>; // optional spinner
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
+  const token = user; // logged-in check
+  const designation = user?.designation;
 
-  return children;
-};
+  const isAdmin = designation === "Admin";
+  const isEmployee = !isAdmin;
 
-// Redirects logged-in users away from login page
-const PublicRoute = ({ children }) => {
-  const { user, initialized } = useAuth();
+  return (
+    <Routes>
+      {/* ================= PUBLIC ROUTE ================= */}
+      {!token && (
+        <>
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </>
+      )}
 
-  if (!initialized) return null;
+      {/* ================= EMPLOYEE ROUTES ================= */}
+      {token && isEmployee && (
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="pomodoro" element={<Pomodoro />} />
+          <Route path="tasks" element={<Task />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="attendence" element={<Attendence />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      )}
 
-  if (user) return <Navigate to="/" replace />;
+      {/* ================= ADMIN ROUTES ================= */}
+      {token && isAdmin && (
+        <Route path="/" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      )}
+    </Routes>
+  );
+}
 
-  return children;
-};
-
-function App() {
+// ====================== MAIN APP ======================
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          {/* Employee */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-            <Route path="pomodoro" element={<Pomodoro />} />
-            <Route path="register" element={<Register />} />
-            <Route path="tasks" element={<Task />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="attendence" element={<Attendence />} />
-          </Route>
-
-          {/* Catch-all redirects */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-          {/* Admin panal */}
-          <Route path="/" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-            <Route path="/adminDashboard" element={<AdminDashboard />} />
-            <Route path="pomodoro" element={<Pomodoro />} />
-            <Route path="register" element={<Register />} />
-            <Route path="tasks" element={<Task />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="attendence" element={<Attendence />} />
-          </Route>
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
   );
 }
-
-export default App;
