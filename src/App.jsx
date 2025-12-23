@@ -11,6 +11,8 @@ import Settings from "./View/Pages/Setting/Settings";
 import Register from "./View/Pages/Register/Register";
 import AdminLayout from "./View/Layout/AdminLayout";
 import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
+import Project from "./View/Pages/ُProject";
+import Employee from "./View/Pages/Employee";
 
 // Protected route waits until AuthContext finishes initialization
 const ProtectedRoute = ({ children }) => {
@@ -71,8 +73,10 @@ function App() {
             <Route path="/adminDashboard" element={<AdminDashboard />} />
             <Route path="pomodoro" element={<Pomodoro />} />
             <Route path="register" element={<Register />} />
+            <Route path="employee" element={<Employee/>} />
             <Route path="tasks" element={<Task />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="project" element={<Project/>} />
             <Route path="settings" element={<Settings />} />
             <Route path="attendence" element={<Attendence />} />
           </Route>
