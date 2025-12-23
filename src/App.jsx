@@ -9,6 +9,8 @@ import Reports from "./View/Pages/Report/Reports";
 import Attendence from "./View/Pages/Attendence/Attendence";
 import Settings from "./View/Pages/Setting/Settings";
 import Register from "./View/Pages/Register/Register";
+import AdminLayout from "./View/Layout/AdminLayout";
+import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
 
 // Protected route waits until AuthContext finishes initialization
 const ProtectedRoute = ({ children }) => {
@@ -42,6 +44,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Employee */}
           <Route
             path="/login"
             element={
@@ -50,14 +53,8 @@ function App() {
               </PublicRoute>
             }
           />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
+          
+          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="pomodoro" element={<Pomodoro />} />
             <Route path="register" element={<Register />} />
@@ -69,6 +66,16 @@ function App() {
 
           {/* Catch-all redirects */}
           <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Admin panal */}
+          <Route path="/" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+            <Route path="/adminDashboard" element={<AdminDashboard />} />
+            <Route path="pomodoro" element={<Pomodoro />} />
+            <Route path="register" element={<Register />} />
+            <Route path="tasks" element={<Task />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="attendence" element={<Attendence />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
