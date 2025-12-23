@@ -1,14 +1,13 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 
-
 import AdminHeader from "./Header/AdminHeader";
 import AdminSidebar from "./Sidebar/AdminSidebar";
 
 const AdminLayout = () => {
   return (
-    <div className="flex h-screen ">
-      <div className="shrink-0">
+    <div className="flex h-screen">
+      <div className="w-[24%]">
         <AdminSidebar />
       </div>
 

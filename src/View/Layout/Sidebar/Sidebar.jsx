@@ -12,11 +12,6 @@ const Sidebar = () => {
   const menu = [
     { text: "Dashboard", icon: <MdOutlineDashboard size={20} />, path: "/" },
     {
-      text: "Add Employee",
-      icon: <IoPersonAddOutline size={20} />,
-      path: "/register",
-    },
-    {
       text: "Pomodoro",
       icon: <RiFileList3Line size={20} />,
       path: "/pomodoro",
@@ -36,8 +31,10 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-74 h-screen p-5 bg-[#141843] shadow-[0_0_40px_rgba(90,169,255,0.35)] text-white">
-      <h1 className="text-2xl flex items-center gap-2 font-bold mb-6"><SiTimescale/> Productive Timer</h1>
+    <div className="w-full h-screen p-5 bg-[#141843] shadow-[0_0_40px_rgba(90,169,255,0.35)] text-white">
+      <h1 className="text-2xl flex items-center gap-2 font-bold mb-6">
+        <SiTimescale /> Productive Timer
+      </h1>
 
       {menu.map((item, index) => {
         const path = item.path;
