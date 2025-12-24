@@ -16,9 +16,9 @@ const AdminSidebar = () => {
       path: "/",
     },
     {
-      text: "Add Employee",
+      text: "Admin Task",
       icon: <IoPersonAddOutline size={18} />,
-      path: "/register",
+      path: "/adminTask",
     },
     {
       text: "Employee",
@@ -29,6 +29,11 @@ const AdminSidebar = () => {
       text: "Project",
       icon: <IoPersonAddOutline size={18} />,
       path: "/project",
+    },
+    {
+      text: "Admin Attedence",
+      icon: <IoPersonAddOutline size={18} />,
+      path: "/adminAttendence",
     },
   ];
 
