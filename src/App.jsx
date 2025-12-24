@@ -25,6 +25,7 @@ import AdminLayout from "./View/Layout/AdminLayout";
 import Pomodoro from "./component/Pomodoro/pomodoro";
 import Project from "./View/Pages/Project/Project";
 import AdminAttendance from "./View/Pages/Attendence/AdminAttendence";
+import AdminTask from "./View/Pages/Task/AdminTask";
 
 // ====================== ROUTES INSIDE PROVIDER ======================
 function AppRoutes() {
@@ -65,7 +66,7 @@ function AppRoutes() {
       {token && isAdmin && (
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="register" element={<Register />} />
+          <Route path="admintask" element={<AdminTask />} />
           <Route path="*" element={<Navigate to="/" replace />} />
           <Route path="project" element={<Project/>}/>
           <Route path="adminAttendence" element={<AdminAttendance/>}/>
