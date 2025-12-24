@@ -20,6 +20,16 @@ const AdminSidebar = () => {
       icon: <IoPersonAddOutline size={18} />,
       path: "/register",
     },
+    {
+      text: "Employee",
+      icon: <IoPersonAddOutline size={18} />,
+      path: "/employee",
+    },
+    {
+      text: "Project",
+      icon: <IoPersonAddOutline size={18} />,
+      path: "/project",
+    },
   ];
 
   return (

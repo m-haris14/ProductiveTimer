@@ -8,6 +8,7 @@ import Task from "./View/Pages/Task/Task";
 import Reports from "./View/Pages/Report/Reports";
 import Attendence from "./View/Pages/Attendence/Attendence";
 import Settings from "./View/Pages/Setting/Settings";
+import Employee from "./View/Pages/Employee/Employee"
 
 // Admin Pages
 import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
@@ -22,6 +23,8 @@ import AdminLayout from "./View/Layout/AdminLayout";
 
 // Common Components
 import Pomodoro from "./component/Pomodoro/pomodoro";
+import Project from "./View/Pages/Project/Project";
+import AdminAttendance from "./View/Pages/Attendence/AdminAttendence";
 
 // ====================== ROUTES INSIDE PROVIDER ======================
 function AppRoutes() {
@@ -64,6 +67,9 @@ function AppRoutes() {
           <Route index element={<AdminDashboard />} />
           <Route path="register" element={<Register />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="project" element={<Project/>}/>
+          <Route path="adminAttendence" element={<AdminAttendance/>}/>
+          <Route path="employee" element={<Employee/>}/>
         </Route>
       )}
     </Routes>
