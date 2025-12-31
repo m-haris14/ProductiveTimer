@@ -24,46 +24,13 @@ const AdminHeader = () => {
     navigate("/login");
   };
 
-  //   const getPageInfo = (pathname) => {
-  //     switch (pathname) {
-  //       case "/":
-  //         return { title: "Dashboard", icon: <MdOutlineDashboard size={24} /> };
-  //       case "/register":
-  //         return {
-  //           title: "Add Employee",
-  //           icon: <IoPersonAddOutline size={24} />,
-  //         };
-  //       case "/pomodoro":
-  //         return { title: "Pomodoro", icon: <RiFileList3Line size={24} /> };
-  //       case "/reports":
-  //         return { title: "Reports", icon: <RiFileList3Line size={24} /> };
-  //       case "/tasks":
-  //         return { title: "Tasks", icon: <RiFileList3Line size={24} /> };
-  //       case "/attendance":
-  //         return { title: "Attendance", icon: <TfiAnnouncement size={24} /> };
-  //       case "/login":
-  //         return { title: "Login", icon: <TfiAnnouncement size={24} /> };
-  //       case "/settings":
-  //         return { title: "Settings", icon: <IoSettingsOutline size={24} /> };
-  //       default:
-  //         return { title: "Dashboard", icon: <MdOutlineDashboard size={24} /> };
-  //     }
-  //   };
 
-  //   const { title, icon } = getPageInfo(location.pathname);
 
   return (
-    <header className="w-full h-14 flex items-center justify-between px-6
+    <header className="w-full h-14 flex items-center justify-end px-6
       bg-linear-to-r from-[#5aa9ff] to-[#4f8dff] shadow-sm">
 
-      {/* Left Icons */}
-      <div className="flex items-center gap-4 text-white">
-        <IoMenuOutline size={22} className="cursor-pointer opacity-90 hover:opacity-100" />
-        <IoExpandOutline size={20} className="cursor-pointer opacity-90 hover:opacity-100" />
-      </div>
-
-      {/* Right Section */}
-      <div className="flex items-center gap-5 text-white">
+      <div className="flex items-center gap-5 text-white ">
 
         <IoHelpCircleOutline size={20} className="cursor-pointer opacity-90 hover:opacity-100" />
 

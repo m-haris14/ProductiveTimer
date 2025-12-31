@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Employee = () => {
+const AdminEmployee = () => {
   const [employees, setEmployees] = useState([
     {
       name: "Asit Kumar Das",
@@ -94,9 +94,10 @@ const Employee = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold text-gray-700">
+      <div className="flex justify-between items-center mb-12">
+        <h1 className="text-4xl font-bold text-blue-700">
           Employee List
+          <p className="text-blue-400 text-base font-normal">You Can See Compnay Employees And Their Biodata</p>
         </h1>
 
         <div className="flex gap-2">
@@ -285,4 +286,4 @@ const Employee = () => {
   );
 };
 
-export default Employee;
+export default AdminEmployee;

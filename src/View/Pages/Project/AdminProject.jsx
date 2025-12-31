@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Project = () => {
+const AdminProject = () => {
   const [projects, setProjects] = useState([
     {
       name: "Test dev Emp project 725",
@@ -111,9 +111,10 @@ const Project = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-gray-700">
+      <div className="flex items-center justify-between mb-12">
+        <h1 className="text-4xl font-bold text-blue-700">
           Projects List
+          <p className="text-blue-400 text-base font-normal">You Can See Company Projects</p>
         </h1>
 
         <div className="flex gap-2">
@@ -294,4 +295,4 @@ const Project = () => {
   );
 };
 
-export default Project;
+export default AdminProject;

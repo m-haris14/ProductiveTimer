@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 const AdminTask = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
 
   const [employees, setEmployees] = useState([
@@ -9,24 +10,18 @@ const AdminTask = () => {
       id: 1,
       name: "Ali Khan",
       department: "Development",
-      totalTime: "8h",
-      timeSpent: "5h 20m",
-      breakTime: "40m",
-      taskTime: "4h 40m",
-      taskStatus: "In Progress",
-      action: "Working",
       tasks: [
         {
           title: "Login Page UI",
           status: "Completed",
-          time: "2025-09-20",
-          timeSpent: "2h 30m",
+          dueDate: "2025-09-20",
+          description: "Create responsive login UI",
         },
         {
           title: "API Integration",
           status: "In Progress",
-          time: "2025-09-22",
-          timeSpent: "1h 15m",
+          dueDate: "2025-09-22",
+          description: "Integrate authentication APIs",
         },
       ],
     },
@@ -34,24 +29,12 @@ const AdminTask = () => {
       id: 2,
       name: "Ahmed Raza",
       department: "Design",
-      totalTime: "8h",
-      timeSpent: "7h",
-      breakTime: "30m",
-      taskTime: "6h 30m",
-      taskStatus: "Completed",
-      action: "Completed",
       tasks: [
         {
           title: "Dashboard Design",
-          status: "Completed",
-          time: "2025-09-18",
-          timeSpent: "2h 30m",
-        },
-        {
-          title: "Icons Setup",
-          status: "Completed",
-          time: "2025-09-19",
-          timeSpent: "1h 15m",
+          status: "In Progress",
+          dueDate: "2025-09-25",
+          description: "Design admin dashboard layout",
         },
       ],
     },
@@ -60,16 +43,24 @@ const AdminTask = () => {
   const [newTask, setNewTask] = useState({
     employeeId: "",
     title: "",
-    date: "",
-    timeSpent: "",
+    dueDate: "",
+    description: "",
   });
 
+  // ===== Helpers =====
+  const getPendingTask = (tasks) =>
+    tasks.find((t) => t.status !== "Completed");
+
+  const getPendingCount = (tasks) =>
+    tasks.filter((t) => t.status !== "Completed").length;
+
+  // ===== Add Task =====
   const handleAddTask = () => {
     if (
       !newTask.employeeId ||
       !newTask.title ||
-      !newTask.date ||
-      !newTask.timeSpent
+      !newTask.dueDate ||
+      !newTask.description
     ) {
       alert("Please fill all fields");
       return;
@@ -85,8 +76,8 @@ const AdminTask = () => {
                 {
                   title: newTask.title,
                   status: "In Progress",
-                  time: newTask.date,
-                  timeSpent: newTask.timeSpent,
+                  dueDate: newTask.dueDate,
+                  description: newTask.description,
                 },
               ],
             }
@@ -98,17 +89,19 @@ const AdminTask = () => {
     setNewTask({
       employeeId: "",
       title: "",
-      date: "",
-      timeSpent: "",
+      dueDate: "",
+      description: "",
     });
   };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+
       {/* ===== Header ===== */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-blue-700">
+      <div className="flex justify-between items-center mb-12">
+        <h1 className="text-4xl font-bold text-blue-700">
           Admin Task Management
+        <p className="text-blue-400 text-base font-normal">You Can See Employees Task</p>
         </h1>
 
         <button
@@ -126,92 +119,98 @@ const AdminTask = () => {
             <tr>
               <th className="px-4 py-3 text-center">Employee</th>
               <th className="px-4 py-3 text-center">Department</th>
-              <th className="px-4 py-3 text-center">Total Time</th>
-              <th className="px-4 py-3 text-center">Time Spent</th>
-              <th className="px-4 py-3 text-center">Break</th>
-              <th className="px-4 py-3 text-center">Task Time</th>
-              <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3 text-center">Action</th>
+              <th className="px-4 py-3 text-center">Due Date</th>
+              <th className="px-4 py-3 text-center">Pending</th>
+              <th className="px-4 py-3 text-center">View</th>
             </tr>
           </thead>
 
           <tbody>
-            {employees.map((emp) => (
-              <tr
-                key={emp.id}
-                onClick={() => setSelectedEmployee(emp)}
-                className="border-b hover:bg-blue-50 cursor-pointer"
-              >
-                <td className="px-4 py-3 text-center font-medium">
-                  {emp.name}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {emp.department}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {emp.totalTime}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {emp.timeSpent}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {emp.breakTime}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {emp.taskTime}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {emp.taskStatus}
-                </td>
-                <td className="px-4 py-3 text-center font-semibold text-blue-600">
-                  {emp.action}
-                </td>
-              </tr>
-            ))}
+            {employees.map((emp) => {
+              const pendingTask = getPendingTask(emp.tasks);
+              const pendingCount = getPendingCount(emp.tasks);
+
+              return (
+                <tr
+                  key={emp.id}
+                  onClick={() => setSelectedEmployee(emp)}
+                  className="border-b hover:bg-blue-50 cursor-pointer"
+                >
+                  <td className="px-4 py-3 text-center font-medium">
+                    {emp.name}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {emp.department}
+                  </td>
+
+                  {/* Due Date */}
+                  <td className="px-4 py-3 text-center">
+                    {pendingTask ? pendingTask.dueDate : "-"}
+                  </td>
+
+                  {/* Pending */}
+                  <td className="px-4 py-3 text-center">
+                    {pendingCount > 0 ? (
+                      <span className="text-orange-600 font-semibold">
+                        {pendingCount} Pending
+                      </span>
+                    ) : (
+                      <span className="text-green-600 font-semibold">
+                        Completed
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    <button className="px-3 py-1 rounded hover:bg-gray-500 hover:text-white">
+                      View
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
-      {/* ===== TASK LIST MODAL ===== */}
+      {/* ===== EMPLOYEE TASK MODAL ===== */}
       {selectedEmployee && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] max-w-3xl rounded-xl p-6 shadow-xl">
+          <div className="bg-white w-[90%] max-w-4xl rounded-xl p-6 shadow-xl">
             <div className="flex justify-between mb-4">
               <h2 className="text-xl font-bold text-blue-700">
-                Tasks Assigned to {selectedEmployee.name}
+                Tasks - {selectedEmployee.name}
               </h2>
               <button
                 onClick={() => setSelectedEmployee(null)}
-                className="text-gray-500 hover:text-red-500 text-xl"
+                className="text-xl"
               >
                 ✕
               </button>
             </div>
 
-            <table className="w-full text-sm text-gray-700">
-              <thead className="bg-sky-100 text-sky-800">
+            <table className="w-full text-sm">
+              <thead className="bg-sky-100">
                 <tr>
-                  <th className="px-4 py-3 text-center">Task</th>
-                  <th className="px-4 py-3 text-center">Status</th>
-                  <th className="px-4 py-3 text-center">Due Date</th>
-                  <th className="px-4 py-3 text-center">Time Spent</th>
+                  <th className="py-2 text-center">Task</th>
+                  <th className="py-2 text-center">Status</th>
+                  <th className="py-2 text-center">Due Date</th>
+                  <th className="py-2 text-center">Description</th>
                 </tr>
               </thead>
 
               <tbody>
                 {selectedEmployee.tasks.map((task, index) => (
-                  <tr key={index} className="border-b">
-                    <td className="px-4 py-3 text-center">
-                      {task.title}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {task.status}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {task.time}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {task.timeSpent}
+                  <tr
+                    key={index}
+                    onClick={() => setSelectedTask(task)}
+                    className="border-b hover:bg-gray-100 cursor-pointer"
+                  >
+                    <td className="py-2 text-center">{task.title}</td>
+                    <td className="py-2 text-center">{task.status}</td>
+                    <td className="py-2 text-center">{task.dueDate}</td>
+                    <td className="py-2 text-center">
+                      {task.description}
                     </td>
                   </tr>
                 ))}
@@ -221,11 +220,50 @@ const AdminTask = () => {
         </div>
       )}
 
+      {/* ===== TASK DETAIL MODAL ===== */}
+      {selectedTask && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-[90%] max-w-md rounded-xl p-6 shadow-xl">
+            <h2 className="text-xl font-bold mb-2">
+              {selectedTask.title}
+            </h2>
+
+            <p className="mb-1">
+              <strong>Due Date:</strong> {selectedTask.dueDate}
+            </p>
+
+            <p className="mb-1">
+              <strong>Status:</strong>{" "}
+              <span
+                className={
+                  selectedTask.status === "Completed"
+                    ? "text-green-600"
+                    : "text-orange-600"
+                }
+              >
+                {selectedTask.status}
+              </span>
+            </p>
+
+            <p className="mt-3 text-gray-700">
+              {selectedTask.description}
+            </p>
+
+            <button
+              onClick={() => setSelectedTask(null)}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ===== ASSIGN TASK MODAL ===== */}
       {assignModalOpen && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-w-md rounded-xl p-6 shadow-xl">
-            <h2 className="text-xl font-bold text-blue-700 mb-4">
+            <h2 className="text-xl font-bold mb-4">
               Assign New Task
             </h2>
 
@@ -260,21 +298,20 @@ const AdminTask = () => {
             <input
               type="date"
               className="w-full border px-3 py-2 rounded mb-3"
-              value={newTask.date}
+              value={newTask.dueDate}
               onChange={(e) =>
-                setNewTask({ ...newTask, date: e.target.value })
+                setNewTask({ ...newTask, dueDate: e.target.value })
               }
             />
 
-            <input
-              type="text"
-              placeholder="Time Spent (e.g 1h 30m)"
+            <textarea
+              placeholder="Task Description"
               className="w-full border px-3 py-2 rounded mb-4"
-              value={newTask.timeSpent}
+              value={newTask.description}
               onChange={(e) =>
                 setNewTask({
                   ...newTask,
-                  timeSpent: e.target.value,
+                  description: e.target.value,
                 })
               }
             />
@@ -297,6 +334,7 @@ const AdminTask = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

@@ -11,29 +11,39 @@ const AdminSidebar = () => {
 
   const menu = [
     {
-      text: "Admin Dashboard",
+      text: "Dashboard",
       icon: <MdOutlineDashboard size={18} />,
       path: "/",
     },
     {
-      text: "Admin Task",
+      text: "Task",
       icon: <IoPersonAddOutline size={18} />,
       path: "/adminTask",
     },
     {
       text: "Employee",
       icon: <IoPersonAddOutline size={18} />,
-      path: "/employee",
+      path: "/adminEmployee",
     },
     {
       text: "Project",
       icon: <IoPersonAddOutline size={18} />,
-      path: "/project",
+      path: "/adminProject",
     },
     {
-      text: "Admin Attedence",
+      text: "Attedence",
       icon: <IoPersonAddOutline size={18} />,
       path: "/adminAttendence",
+    },
+    {
+      text: "Reports",
+      icon: <IoPersonAddOutline size={18} />,
+      path: "/adminReports",
+    },
+    {
+      text: "Setting",
+      icon: <IoPersonAddOutline size={18} />,
+      path: "/adminSetting",
     },
   ];
 
@@ -42,7 +52,7 @@ const AdminSidebar = () => {
       {/* Logo */}
       <h1 className="text-2xl flex items-center gap-2 font-bold text-[#2563eb] mb-6">
         <SiTimescale className="text-[#2563eb]" />
-        Productive Timer
+        Ten Bit Solutions
       </h1>
 
       {/* Menu */}
