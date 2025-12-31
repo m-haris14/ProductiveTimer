@@ -11,18 +11,14 @@ const Sidebar = () => {
 
   const menu = [
     { text: "Dashboard", icon: <MdOutlineDashboard size={20} />, path: "/" },
-    {
-      text: "Pomodoro",
-      icon: <RiFileList3Line size={20} />,
-      path: "/pomodoro",
-    },
-    { text: "Reports", icon: <RiFileList3Line size={20} />, path: "/reports" },
+
     { text: "Tasks", icon: <RiFileList3Line size={20} />, path: "/tasks" },
     {
       text: "Attendence",
       icon: <TfiAnnouncement size={20} />,
       path: "/attendence",
     },
+    { text: "Reports", icon: <RiFileList3Line size={20} />, path: "/reports" },
     {
       text: "Settings",
       icon: <IoSettingsOutline size={20} />,

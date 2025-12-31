@@ -8,7 +8,7 @@ import Task from "./View/Pages/Task/Task";
 import Reports from "./View/Pages/Report/Reports";
 import Attendence from "./View/Pages/Attendence/Attendence";
 import Settings from "./View/Pages/Setting/Settings";
-import Employee from "./View/Pages/Employee/Employee"
+
 
 // Admin Pages
 import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
@@ -23,9 +23,12 @@ import AdminLayout from "./View/Layout/AdminLayout";
 
 // Common Components
 import Pomodoro from "./component/Pomodoro/pomodoro";
-import Project from "./View/Pages/Project/Project";
 import AdminAttendance from "./View/Pages/Attendence/AdminAttendence";
 import AdminTask from "./View/Pages/Task/AdminTask";
+import AdminReports from "./View/Pages/Report/AdminReports";
+import AdminSetting from "./View/Pages/Setting/AdminSetting";
+import AdminEmployee from "./View/Pages/Employee/AdminEmployee";
+import AdminProject from "./View/Pages/Project/AdminProject";
 
 // ====================== ROUTES INSIDE PROVIDER ======================
 function AppRoutes() {
@@ -68,9 +71,11 @@ function AppRoutes() {
           <Route index element={<AdminDashboard />} />
           <Route path="admintask" element={<AdminTask />} />
           <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="project" element={<Project/>}/>
+          <Route path="adminProject" element={<AdminProject/>}/>
           <Route path="adminAttendence" element={<AdminAttendance/>}/>
-          <Route path="employee" element={<Employee/>}/>
+          <Route path="adminEmployee" element={<AdminEmployee/>}/>
+          <Route path="adminReports" element={<AdminReports/>}/>
+          <Route path="adminSetting" element={<AdminSetting/>}/>
         </Route>
       )}
     </Routes>

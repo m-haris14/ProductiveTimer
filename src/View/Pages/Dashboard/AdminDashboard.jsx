@@ -14,12 +14,13 @@ const AdminDashboard = () => {
     <div className="p-6 bg-[#f3f4f6] min-h-screen">
 
       {/* Title */}
-      <h1 className="text-lg font-semibold text-gray-700 mb-4">
+      <h1 className="text-4xl font-bold text-blue-700">
         Admin Dashboard
+      <p className="text-blue-400 text-base mb-8 font-normal">You Can See About Our Compnay</p>
       </h1>
 
       {/* Top Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mt-4 mb-6">
         {stats.map((item, index) => (
           <div
             key={index}
