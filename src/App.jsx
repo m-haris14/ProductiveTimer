@@ -8,7 +8,7 @@ import Task from "./View/Pages/Task/Task";
 import Reports from "./View/Pages/Report/Reports";
 import Attendence from "./View/Pages/Attendence/Attendence";
 import Settings from "./View/Pages/Setting/Settings";
-
+import Employee from "./View/Pages/Employee/Employee";
 
 // Admin Pages
 import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
@@ -55,7 +55,7 @@ function AppRoutes() {
       {/* ================= EMPLOYEE ROUTES ================= */}
       {token && isEmployee && (
         <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<Dashboard employeeId={user._id} />} />
           <Route path="pomodoro" element={<Pomodoro />} />
           <Route path="tasks" element={<Task />} />
           <Route path="reports" element={<Reports />} />
