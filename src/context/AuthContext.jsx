@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const AuthContext = createContext();
 
@@ -17,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post("http://localhost:5000/login", {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
         username,
         password,
       });
@@ -35,13 +36,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      if (user && user._id) {
+        await axios.post(`${API_BASE_URL}/timer/logout-stop`, {
+          employeeId: user._id,
+        });
+      }
+    } catch (err) {
+      console.error("Error stopping timers during logout:", err);
+    }
     setUser(null);
     localStorage.removeItem("user");
   };
 
+  const updateUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, initialized }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, initialized, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

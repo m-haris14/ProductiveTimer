@@ -1,6 +1,6 @@
 import { MdOutlineDashboard } from "react-icons/md";
 import { useNavigate, useLocation } from "react-router-dom";
-import { IoPersonAddOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoSettingsOutline, IoBriefcaseOutline } from "react-icons/io5";
 import { RiFileList3Line } from "react-icons/ri";
 import { TfiAnnouncement } from "react-icons/tfi";
 import { SiTimescale } from "react-icons/si";
@@ -14,11 +14,21 @@ const Sidebar = () => {
 
     { text: "Tasks", icon: <RiFileList3Line size={20} />, path: "/tasks" },
     {
+      text: "Projects",
+      icon: <IoBriefcaseOutline size={20} />,
+      path: "/projects",
+    },
+    {
       text: "Attendence",
       icon: <TfiAnnouncement size={20} />,
       path: "/attendence",
     },
     { text: "Reports", icon: <RiFileList3Line size={20} />, path: "/reports" },
+    {
+      text: "Leave",
+      icon: <RiFileList3Line size={20} />,
+      path: "/leave",
+    },
     {
       text: "Settings",
       icon: <IoSettingsOutline size={20} />,

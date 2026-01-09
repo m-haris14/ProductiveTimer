@@ -1,18 +1,19 @@
 // App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
+import { ConfirmProvider } from "./context/ConfirmContext";
 
 // Employee Pages
 import Dashboard from "./View/Pages/Dashboard/Dashboard";
 import Task from "./View/Pages/Task/Task";
 import Reports from "./View/Pages/Report/Reports";
+import ProjectReport from "./View/Pages/Report/ProjectReport";
 import Attendence from "./View/Pages/Attendence/Attendence";
 import Settings from "./View/Pages/Setting/Settings";
-import Employee from "./View/Pages/Employee/Employee";
 
 // Admin Pages
 import AdminDashboard from "./View/Pages/Dashboard/AdminDashboard";
-import Register from "./View/Pages/Register/Register";
 
 // Auth Pages
 import Login from "./View/Pages/Login/Login";
@@ -21,14 +22,16 @@ import Login from "./View/Pages/Login/Login";
 import Layout from "./View/Layout/Layout";
 import AdminLayout from "./View/Layout/AdminLayout";
 
-// Common Components
-import Pomodoro from "./component/Pomodoro/pomodoro";
 import AdminAttendance from "./View/Pages/Attendence/AdminAttendence";
 import AdminTask from "./View/Pages/Task/AdminTask";
-import AdminReports from "./View/Pages/Report/AdminReports";
+
 import AdminSetting from "./View/Pages/Setting/AdminSetting";
 import AdminEmployee from "./View/Pages/Employee/AdminEmployee";
 import AdminProject from "./View/Pages/Project/AdminProject";
+import AdminLeave from "./View/Pages/Leave/AdminLeave";
+import EmployeeLeave from "./View/Pages/Leave/EmployeeLeave";
+import EmployeeProject from "./View/Pages/Project/EmployeeProject";
+import ProjectDetails from "./View/Pages/Project/ProjectDetails";
 
 // ====================== ROUTES INSIDE PROVIDER ======================
 function AppRoutes() {
@@ -40,7 +43,9 @@ function AppRoutes() {
   const designation = user?.designation;
 
   const isAdmin = designation === "Admin";
-  const isEmployee = !isAdmin;
+  const isTeamLead = designation === "Team Lead";
+  const isManagement = isAdmin || isTeamLead;
+  const isEmployee = !isAdmin && !isTeamLead;
 
   return (
     <Routes>
@@ -56,26 +61,38 @@ function AppRoutes() {
       {token && isEmployee && (
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard employeeId={user._id} />} />
-          <Route path="pomodoro" element={<Pomodoro />} />
           <Route path="tasks" element={<Task />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
           <Route path="attendence" element={<Attendence />} />
+          <Route path="leave" element={<EmployeeLeave />} />
+          <Route path="projects" element={<EmployeeProject />} />
+          <Route path="projects/:projectId" element={<ProjectDetails />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       )}
 
-      {/* ================= ADMIN ROUTES ================= */}
-      {token && isAdmin && (
+      {/* ================= MANAGEMENT ROUTES (Admin & TL) ================= */}
+      {token && isManagement && (
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="admintask" element={<AdminTask />} />
+          <Route path="adminProject" element={<AdminProject />} />
+          <Route path="projects/:projectId" element={<ProjectDetails />} />
+
+          {/* Admin Only Routes */}
+          {isAdmin && (
+            <>
+              <Route path="adminAttendence" element={<AdminAttendance />} />
+              <Route path="adminEmployee" element={<AdminEmployee />} />
+              <Route path="adminLeave" element={<AdminLeave />} />
+              <Route path="adminSetting" element={<AdminSetting />} />
+              <Route path="project-reports" element={<ProjectReport />} />
+            </>
+          )}
+
+          {/* Fallback for Team Leads trying to access Admin-only pages or just any missing route */}
           <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="adminProject" element={<AdminProject/>}/>
-          <Route path="adminAttendence" element={<AdminAttendance/>}/>
-          <Route path="adminEmployee" element={<AdminEmployee/>}/>
-          <Route path="adminReports" element={<AdminReports/>}/>
-          <Route path="adminSetting" element={<AdminSetting/>}/>
         </Route>
       )}
     </Routes>
@@ -85,10 +102,14 @@ function AppRoutes() {
 // ====================== MAIN APP ======================
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <ToastProvider>
+      <ConfirmProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthProvider>
+      </ConfirmProvider>
+    </ToastProvider>
   );
 }

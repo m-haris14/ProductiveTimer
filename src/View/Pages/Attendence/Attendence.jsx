@@ -1,84 +1,96 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "../../../config";
+import { useAuth } from "../../../context/AuthContext";
+import AttendenceCard from "../../../component/Attendence/AttendenceCard";
 
 const Attendance = () => {
-  const attendanceData = [
-    {
-      date: "2025-01-01",
-      checkIn: "09:05 AM",
-      checkOut: "05:00 PM",
-      status: "Present",
-    },
-    {
-      date: "2025-01-02",
-      checkIn: "09:30 AM",
-      checkOut: "05:10 PM",
-      status: "Late",
-    },
-    {
-      date: "2025-01-03",
-      checkIn: "-",
-      checkOut: "-",
-      status: "Leave",
-    },
-    {
-      date: "2025-01-04",
-      checkIn: "-",
-      checkOut: "-",
-      status: "Absent",
-    },
-    {
-      date: "2025-01-05",
-      checkIn: "09:00 AM",
-      checkOut: "04:45 PM",
-      status: "Present",
-    },
-  ];
+  const { user } = useAuth();
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
+  const [stats, setStats] = useState({
+    present: 0,
+    absent: 0,
+    leaves: 0,
+    late: 0,
+  });
+
+  useEffect(() => {
+    if (user?._id) {
+      fetchData();
+    }
+  }, [user]);
+
+  const fetchData = async () => {
+    try {
+      // Fetch History
+      const historyRes = await axios.get(
+        `${API_BASE_URL}/attendance/my/${user._id}`
+      );
+      setAttendanceHistory(historyRes.data);
+
+      // Fetch Stats
+      const statsRes = await axios.get(
+        `${API_BASE_URL}/stats/report/${user._id}`
+      );
+
+      setStats({
+        present: historyRes.data.filter(
+          (r) => r.status === "working" || r.status === "checked-out"
+        ).length,
+        absent: 0, // Placeholder
+        leaves: statsRes.data.attendance.leaves,
+        late: statsRes.data.attendance.late,
+      });
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+    }
+  };
+
+  const formatTime = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatDate = (dateString) => {
+    // Keep date format simple as per original design or standard YYYY-MM-DD
+    // Original was "2025-01-01", let's match that style or readable date
+    return new Date(dateString).toLocaleDateString("en-CA"); // YYYY-MM-DD format
+  };
 
   return (
-    <div className="min-h-screen p-6 bg-linear-to-br from-[#0f1235] via-[#141857] to-[#1b1f6b] text-white">
-
-      {/* ===== Page Header ===== */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold">Attendance</h1>
-        <p className="text-gray-300 text-sm">
-          Monthly attendance overview
-        </p>
-      </div>
-
-      {/* ===== Admin Style Summary Cards ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-
-        <AdminCard
+    <div className="text-white">
+      <div className="w-full flex gap-6 mb-8">
+        <AttendenceCard
           title="Present Days"
-          value="20"
-          // color="bg-blue-500/20 text-blue-400"
+          value={stats.present}
+          color="bg-blue-500/20 text-blue-400"
         />
 
-        <AdminCard
+        <AttendenceCard
           title="Absent Days"
-          value="4"
-          // color="bg-red-500/20 text-red-400"
+          value={stats.absent}
+          color="bg-red-500/20 text-red-400"
         />
 
-        <AdminCard
+        <AttendenceCard
           title="Leaves"
-          value="3"
-          // color="bg-purple-500/20 text-purple-400"
+          value={stats.leaves}
+          color="bg-purple-500/20 text-purple-400"
         />
 
-        <AdminCard
+        <AttendenceCard
           title="Late Days"
-          value="5"
-          // color="bg-indigo-500/20 text-indigo-400"
+          value={stats.late}
+          color="bg-indigo-500/20 text-indigo-400"
         />
-
       </div>
 
       {/* ===== Attendance Table ===== */}
       <div className="bg-[#141857] rounded-2xl shadow-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">
-          Attendance Details
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">Attendance Details</h2>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -87,65 +99,79 @@ const Attendance = () => {
                 <th className="py-3">Date</th>
                 <th>Check In</th>
                 <th>Check Out</th>
+                <th>Total Work</th>
                 <th>Status</th>
               </tr>
             </thead>
 
             <tbody>
-              {attendanceData.map((item, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-white/5 hover:bg-white/5 transition"
-                >
-                  <td className="py-3">{item.date}</td>
-                  <td>{item.checkIn}</td>
-                  <td>{item.checkOut}</td>
-                  <td>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        item.status === "Present"
-                          ? "bg-green-500/20 text-green-400"
-                          : item.status === "Late"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : item.status === "Leave"
-                          ? "bg-purple-500/20 text-purple-400"
-                          : "bg-red-500/20 text-red-400"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
+              {attendanceHistory.length > 0 ? (
+                attendanceHistory.map((item, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-white/5 hover:bg-white/5 transition"
+                  >
+                    <td className="py-3">{formatDate(item.date)}</td>
+                    <td>{formatTime(item.firstCheckIn)}</td>
+                    <td>{formatTime(item.lastCheckOut)}</td>
+                    <td>
+                      {(() => {
+                        const seconds = item.workDuration || 0;
+                        const h = Math.floor(seconds / 3600);
+                        const m = Math.floor((seconds % 3600) / 60);
+                        const s = Math.floor(seconds % 60);
+
+                        const requiredSeconds =
+                          (item.requiredHours || 8) * 3600;
+                        const isShort = seconds < requiredSeconds;
+
+                        return (
+                          <span
+                            className={`font-bold ${
+                              isShort ? "text-red-400" : "text-green-400"
+                            }`}
+                          >
+                            {`${h}h ${m}m ${s}s`}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          item.status === "working" ||
+                          item.status === "checked-out"
+                            ? "bg-green-500/20 text-green-400"
+                            : item.status === "late"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : item.status === "leave"
+                            ? "bg-purple-500/20 text-purple-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {/* Map internal status to display status if needed */}
+                        {item.status === "working" ||
+                        item.status === "checked-out"
+                          ? "Present"
+                          : item.status.charAt(0).toUpperCase() +
+                            item.status.slice(1)}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="py-4 text-center text-gray-400">
+                    No attendance records found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
-
           </table>
         </div>
       </div>
     </div>
   );
 };
-
-/* ===== Admin Style Card ===== */
-const AdminCard = ({ title, value, color }) => (
-  <div className="bg-[#141857] rounded-2xl p-6 shadow-lg flex items-center gap-5">
-
-    {/* Left Colored Box */}
-    <div
-      className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold ${color}`}
-    >
-      {value}
-    </div>
-
-    {/* Right Content */}
-    <div>
-      <h3 className="text-sm text-gray-300">{title}</h3>
-      <p className="text-xs text-gray-400 mt-1">
-        This Month
-      </p>
-    </div>
-
-  </div>
-);
 
 export default Attendance;

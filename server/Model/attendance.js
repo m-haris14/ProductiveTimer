@@ -22,10 +22,13 @@ const attendanceSchema = new mongoose.Schema(
     breakDuration: { type: Number, default: 0 }, // cumulative seconds
     status: {
       type: String,
-      enum: ["working", "break", "none"],
+      enum: ["working", "break", "none", "stopped", "checked-out", "leave"],
       default: "none",
     },
     lastStatusChange: { type: Date, default: Date.now },
+    requiredHours: { type: Number, default: 8 }, // Snapshot of requirement for this day
+    hoursShortage: { type: Number, default: 0 }, // Positive = Shortage, Negative = Surname
+    cumulativeShortage: { type: Number, default: 0 }, // Running total
   },
   { timestamps: true }
 );

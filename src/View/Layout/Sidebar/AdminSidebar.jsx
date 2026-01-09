@@ -1,6 +1,13 @@
 import { MdOutlineDashboard } from "react-icons/md";
 import { useNavigate, useLocation } from "react-router-dom";
-import { IoPersonAddOutline, IoSettingsOutline } from "react-icons/io5";
+import {
+  IoPersonAddOutline,
+  IoSettingsOutline,
+  IoBriefcaseOutline,
+  IoClipboardOutline,
+  IoCalendarOutline,
+  IoPieChartOutline,
+} from "react-icons/io5";
 import { RiFileList3Line } from "react-icons/ri";
 import { TfiAnnouncement } from "react-icons/tfi";
 import { SiTimescale } from "react-icons/si";
@@ -17,8 +24,8 @@ const AdminSidebar = () => {
     },
     {
       text: "Task",
-      icon: <IoPersonAddOutline size={18} />,
-      path: "/adminTask",
+      icon: <IoClipboardOutline size={18} />,
+      path: "/admintask",
     },
     {
       text: "Employee",
@@ -27,22 +34,28 @@ const AdminSidebar = () => {
     },
     {
       text: "Project",
-      icon: <IoPersonAddOutline size={18} />,
+      icon: <IoBriefcaseOutline size={18} />,
       path: "/adminProject",
     },
     {
-      text: "Attedence",
-      icon: <IoPersonAddOutline size={18} />,
+      text: "Attendance",
+      icon: <IoCalendarOutline size={18} />,
       path: "/adminAttendence",
     },
+
     {
-      text: "Reports",
-      icon: <IoPersonAddOutline size={18} />,
-      path: "/adminReports",
+      text: "Leave",
+      icon: <IoCalendarOutline size={18} />,
+      path: "/adminLeave",
+    },
+    {
+      text: "Project Reports",
+      icon: <IoPieChartOutline size={18} />,
+      path: "/project-reports",
     },
     {
       text: "Setting",
-      icon: <IoPersonAddOutline size={18} />,
+      icon: <IoSettingsOutline size={18} />,
       path: "/adminSetting",
     },
   ];

@@ -46,6 +46,7 @@ const Login = () => {
               <input
                 type="text"
                 placeholder="Enter Username"
+                autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl
@@ -59,6 +60,7 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="Enter Password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl
