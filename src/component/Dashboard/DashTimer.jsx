@@ -12,31 +12,61 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
   const [isBreak, setIsBreak] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
   const [isCheckedOut, setIsCheckedOut] = useState(false);
+  const [isIdleStatus, setIsIdleStatus] = useState(false); // Server idle status
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [baseDailySeconds, setBaseDailySeconds] = useState(0); // Total display base
   const [baseBreakSeconds, setBaseBreakSeconds] = useState(0); // Break base
   const [baseBreakCountdown, setBaseBreakCountdown] = useState(3600); // Snapshot for stable countdown
   const [cumulativeBreakSeconds, setCumulativeBreakSeconds] = useState(0);
+  const [idleCountdown, setIdleCountdown] = useState(0); // Idle time elapsed
+  const [baseIdleSeconds, setBaseIdleSeconds] = useState(0); // Base idle time
+  const [showIdleReasonModal, setShowIdleReasonModal] = useState(false);
+  const [idleReason, setIdleReason] = useState("");
 
-  // 5 minutes idle (300s), Alert at 4m 50s
-  const { isIdle, isPrompted } = useIdleTimer(300000, 290000);
+
+
+  // 30 minutes idle (1800s), Alert at 29m 50s
+  const { isIdle, isPrompted } = useIdleTimer(1800000, 1790000);
+
+  // Electron System Idle Tracking
+  const [systemIdleSeconds, setSystemIdleSeconds] = useState(0);
+  const [isElectron, setIsElectron] = useState(false);
+
+  useEffect(() => {
+    if (window.electron) {
+      setIsElectron(true);
+      window.electron.onSystemIdleTime((inputSeconds) => {
+        // inputSeconds is typically seconds, verify from main.cjs
+        setSystemIdleSeconds(inputSeconds);
+      });
+    }
+  }, []);
 
   // Auto-switch based on logic (Now safe to use state)
   useEffect(() => {
-    // 1. Auto-Break: If Working AND Idle > 5 mins -> Switch to Break
-    if (isRunning && isIdle) {
-      console.log("User is idle for 5 mins. Auto-switching to Break.");
-      takeBreak();
+    // 1. Auto-Idle Logic
+    if (isRunning && !isIdleStatus) {
+      // If Electron: Use System Idle Time > 30 mins
+      if (isElectron) {
+        if (systemIdleSeconds >= 1800) {
+          console.log("System Idle > 30 mins. Auto-switching to Idle.");
+          startIdle();
+        }
+      }
+      // If Web: Use Browser Idle Time (isIdle from useIdleTimer)
+      else if (isIdle) {
+        console.log("Browser Idle > 30 mins. Auto-switching to Idle.");
+        startIdle();
+      }
     }
 
     // 2. Auto-Stop: If on Break AND Break Countdown hits 0 -> Stop Timer
-    // This provides a safety net if the ticker logic alone doesn't pause the status.
     if (isBreak && breakCountdown <= 0) {
       console.log("Break limit exhausted. Auto-stopping timer.");
       pauseTimer();
     }
-  }, [isRunning, isIdle, isBreak, breakCountdown]);
+  }, [isRunning, isIdle, isIdleStatus, isBreak, breakCountdown, isElectron, systemIdleSeconds]);
 
   // Format seconds → HH:MM:SS
   const formatTime = (secs) => {
@@ -111,6 +141,20 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
         if (!startTime || Math.abs(calculatedStart - startTime) > 2000) {
           setStartTime(calculatedStart);
         }
+      } else if (status === "idle") {
+        const idleData = await axios.get(`${API_BASE_URL}/idle/active/${employeeId}`);
+        setIsIdleStatus(true);
+        setIsRunning(false);
+        setIsBreak(false);
+        setIsStopped(false);
+        setIsCheckedOut(false);
+
+        // Stabilize Start Time for idle too
+        const calculatedStart = Date.now() - idleData.data.elapsedSeconds * 1000;
+        if (!startTime || Math.abs(calculatedStart - startTime) > 2000) {
+          setStartTime(calculatedStart);
+        }
+        setBaseIdleSeconds(idleData.data.elapsedSeconds);
       } else if (status === "stopped") {
         setIsRunning(false);
         setIsBreak(false);
@@ -296,6 +340,49 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
     }
   };
 
+
+  const startIdle = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/timer/idle/start`, { employeeId });
+      setIsRunning(false);
+      setIsBreak(false);
+      setIsStopped(false);
+      setIsIdleStatus(true);
+      setIsCheckedOut(false);
+      setStartTime(Date.now());
+      fetchStats();
+      if (onStatusChange) onStatusChange("idle");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const resumeFromIdleWithReason = async () => {
+    if (!idleReason || idleReason.trim().length === 0) {
+      alert("Please provide a reason for idle time");
+      return;
+    }
+
+    try {
+      await axios.post(`${API_BASE_URL}/timer/idle/resume`, {
+        employeeId,
+        reason: idleReason.trim()
+      });
+      setIsIdleStatus(false);
+      setIsRunning(true);
+      setIsBreak(false);
+      setIsStopped(false);
+      setIsCheckedOut(false);
+      setStartTime(Date.now());
+      setShowIdleReasonModal(false);
+      setIdleReason("");
+      fetchStats();
+      if (onStatusChange) onStatusChange("working");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to resume from idle");
+    }
+  };
   const takeBreak = async () => {
     try {
       await axios.post(`${API_BASE_URL}/timer/stop`, { employeeId });
@@ -355,6 +442,10 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
             <span className="text-red-400 font-bold underline">
               Day Ended: Checked Out
             </span>
+          ) : isIdleStatus ? (
+            <span className="text-orange-400">
+              Idle: {formatTime(Math.floor((Date.now() - (startTime || Date.now())) / 1000))}
+            </span>
           ) : isBreak ? (
             <span className="text-purple-400">
               On Break: {formatTime(breakCountdown)}
@@ -379,6 +470,13 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
               Attendance & total time recorded.
             </p>
           </div>
+        ) : isIdleStatus ? (
+          <button
+            onClick={() => setShowIdleReasonModal(true)}
+            className="flex-1 py-3 rounded-xl bg-linear-to-r from-orange-500 to-orange-600 cursor-pointer hover:scale-105 transition-transform font-bold"
+          >
+            ▶ Resume from Idle
+          </button>
         ) : !isRunning && !isBreak ? (
           <button
             onClick={startWork}
@@ -393,11 +491,10 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
                 <button
                   onClick={takeBreak}
                   disabled={cumulativeBreakSeconds >= 3600}
-                  className={`flex-1 py-3 rounded-xl bg-linear-to-r from-[#8b5cf6] to-[#7c3aed] transition-transform font-bold ${
-                    cumulativeBreakSeconds >= 3600
-                      ? "opacity-30 cursor-not-allowed filter grayscale"
-                      : "cursor-pointer hover:scale-105"
-                  }`}
+                  className={`flex-1 py-3 rounded-xl bg-linear-to-r from-[#8b5cf6] to-[#7c3aed] transition-transform font-bold ${cumulativeBreakSeconds >= 3600
+                    ? "opacity-30 cursor-not-allowed filter grayscale"
+                    : "cursor-pointer hover:scale-105"
+                    }`}
                   title={
                     cumulativeBreakSeconds >= 3600 ? "Break limit reached" : ""
                   }
@@ -462,6 +559,48 @@ const DashTimer = ({ employeeId, onStatsUpdate, onStatusChange }) => {
                   className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition-colors font-bold cursor-pointer"
                 >
                   Yes, Check Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Idle Reason Modal */}
+      {showIdleReasonModal && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1a1f4d] border border-white/10 rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all scale-100 animate-in fade-in zoom-in duration-200">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-500/30">
+                <span className="text-3xl">⏸️</span>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Resume from Idle</h2>
+              <p className="text-gray-400 mb-6">
+                Please provide a reason for your idle time. This will be reviewed by the admin.
+              </p>
+              <textarea
+                value={idleReason}
+                onChange={(e) => setIdleReason(e.target.value)}
+                placeholder="e.g., Meeting with client, Technical issue on PC, Working on design software..."
+                className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 mb-6 min-h-[100px] resize-none focus:outline-none focus:border-orange-500/50"
+                rows={4}
+              />
+              <div className="flex gap-4">
+                <button
+                  onClick={() => {
+                    setShowIdleReasonModal(false);
+                    setIdleReason("");
+                  }}
+                  className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-colors font-medium cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={resumeFromIdleWithReason}
+                  disabled={!idleReason || idleReason.trim().length === 0}
+                  className="flex-1 py-3 rounded-xl bg-orange-600 hover:bg-orange-500 transition-colors font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Resume Work
                 </button>
               </div>
             </div>

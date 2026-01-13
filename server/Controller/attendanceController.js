@@ -4,6 +4,7 @@ import Task from "../Model/task.js";
 import Leave from "../Model/leave.js";
 import Settings from "../Model/settings.js";
 import Holiday from "../Model/holiday.js";
+import Idle from "../Model/idle.js";
 import { getTodayStart } from "../Utils/dateUtils.js";
 import { stopActiveTask } from "./taskController.js";
 
@@ -86,6 +87,136 @@ export const stopTimer = async (req, res) => {
   }
 };
 
+// Start Idle Timer (triggered by auto-idle after 15 min)
+export const startIdleTimer = async (req, res) => {
+  try {
+    const { employeeId } = req.body;
+    const today = getTodayStart();
+
+    let attendance = await Attendance.findOne({
+      employee: employeeId,
+      date: today,
+    });
+    if (!attendance || attendance.status !== "working") {
+      return res.status(400).json({ message: "Not working" });
+    }
+
+    const elapsed = (Date.now() - attendance.lastStatusChange.getTime()) / 1000;
+    attendance.workDuration += elapsed;
+
+    attendance.status = "idle";
+    attendance.lastStatusChange = new Date();
+    await attendance.save();
+
+    // Create a new Idle document to track this idle session
+    const idleRecord = new Idle({
+      employee: employeeId,
+      startTime: new Date(),
+      status: "running",
+    });
+    await idleRecord.save();
+
+    // Emit socket event for real-time update
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("attendance_update", {
+        employeeId: employeeId.toString(),
+        status: "idle",
+        type: "idle",
+        serverTime: new Date(),
+        statusChangedAt: new Date(),
+      });
+    }
+
+    res.json({ message: "Idle started", attendance, idleId: idleRecord._id });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Resume from Idle (when employee provides a reason)
+export const resumeFromIdle = async (req, res) => {
+  try {
+    const { employeeId, reason } = req.body;
+    const today = getTodayStart();
+
+    // Validate reason
+    if (!reason || reason.trim().length === 0) {
+      return res.status(400).json({ message: "Reason is required to resume from idle" });
+    }
+
+    let attendance = await Attendance.findOne({
+      employee: employeeId,
+      date: today,
+    });
+    if (!attendance || attendance.status !== "idle") {
+      return res.status(400).json({ message: "Not in idle status" });
+    }
+
+    // Find the active idle session
+    const idleRecord = await Idle.findOne({
+      employee: employeeId,
+      status: "running",
+    }).sort({ startTime: -1 });
+
+    if (!idleRecord) {
+      return res.status(400).json({ message: "No active idle session found" });
+    }
+
+    // Calculate idle duration
+    const now = new Date();
+    const idleDuration = Math.floor((now - idleRecord.startTime.getTime()) / 1000);
+
+    // Update idle record
+    idleRecord.endTime = now;
+    idleRecord.duration = idleDuration;
+    idleRecord.status = "stopped";
+    idleRecord.reason = reason.trim();
+    idleRecord.approvalStatus = "pending";
+    await idleRecord.save();
+
+    // Update attendance - add idle duration to idleDuration field  
+    const elapsed = (now - attendance.lastStatusChange.getTime()) / 1000;
+    attendance.idleDuration += elapsed;
+
+    // Resume working status
+    attendance.status = "working";
+    attendance.lastStatusChange = now;
+    await attendance.save();
+
+    // Emit socket event for real-time update
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("attendance_update", {
+        employeeId: employeeId.toString(),
+        status: "working",
+        type: "resume",
+        serverTime: now,
+        statusChangedAt: now,
+      });
+
+      // Notify admins of new pending idle request
+      io.emit("idle_request_created", {
+        idleId: idleRecord._id,
+        employeeId: employeeId.toString(),
+        duration: idleDuration,
+        reason: reason.trim(),
+        timestamp: now,
+      });
+    }
+
+    res.json({ 
+      message: "Resumed from idle", 
+      attendance, 
+      idleId: idleRecord._id,
+      pendingApproval: true
+    });
+  } catch (error) {
+    console.error("Resume from idle error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 export const pauseTimer = async (req, res) => {
   try {
     const { employeeId } = req.body;
@@ -199,6 +330,20 @@ export const getActiveBreak = async (req, res) => {
     (Date.now() - attendance.lastStatusChange.getTime()) / 1000
   );
   res.json({ elapsedSeconds: Math.min(elapsedSeconds, 3600) });
+};
+
+export const getActiveIdle = async (req, res) => {
+  const today = getTodayStart();
+  const attendance = await Attendance.findOne({
+    employee: req.params.employeeId,
+    date: today,
+    status: "idle",
+  });
+  if (!attendance) return res.json(null);
+  const elapsedSeconds = Math.floor(
+    (Date.now() - attendance.lastStatusChange.getTime()) / 1000
+  );
+  res.json({ elapsedSeconds });
 };
 
 export const getCurrentStatus = async (req, res) => {
@@ -1066,10 +1211,8 @@ export const syncMachineAttendance = async (req, res) => {
         attendance.lastStatusChange = lastLog;
 
         console.log(
-          `[Sync] Employee ${
-            employee.fullName
-          }: Timer stopped at ${lastLog.toLocaleTimeString()}, total work: ${
-            attendance.workDuration
+          `[Sync] Employee ${employee.fullName
+          }: Timer stopped at ${lastLog.toLocaleTimeString()}, total work: ${attendance.workDuration
           }s`
         );
       }

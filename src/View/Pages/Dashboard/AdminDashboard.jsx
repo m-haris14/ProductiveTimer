@@ -12,6 +12,8 @@ const AdminDashboard = () => {
     suspended: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [pendingIdleRequests, setPendingIdleRequests] = useState([]);
+  const [loadingIdle, setLoadingIdle] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -25,7 +27,20 @@ const AdminDashboard = () => {
       }
     };
 
+    const fetchPendingIdleRequests = async () => {
+      try {
+        setLoadingIdle(true);
+        const res = await axios.get(`${API_BASE_URL}/admin/idle/pending`);
+        setPendingIdleRequests(res.data);
+        setLoadingIdle(false);
+      } catch (err) {
+        console.error("Error fetching pending idle requests:", err);
+        setLoadingIdle(false);
+      }
+    };
+
     fetchStats();
+    fetchPendingIdleRequests();
 
     // Socket Listener for Real-time Updates
     const onAttendanceUpdate = (data) => {
@@ -33,8 +48,21 @@ const AdminDashboard = () => {
       fetchStats();
     };
 
+    const onIdleRequestCreated = (data) => {
+      console.log("[Admin Dashboard] New idle request:", data);
+      fetchPendingIdleRequests();
+    };
+
+    const onIdleApprovalUpdate = (data) => {
+      console.log("[Admin Dashboard] Idle approval update:", data);
+      fetchPendingIdleRequests();
+      fetchStats(); // Refresh stats after approval
+    };
+
     import("../../../socket").then(({ socket }) => {
       socket.on("attendance_update", onAttendanceUpdate);
+      socket.on("idle_request_created", onIdleRequestCreated);
+      socket.on("idle_approval_update", onIdleApprovalUpdate);
     });
 
     const interval = setInterval(fetchStats, 30000); // 30s polling fallback
@@ -42,9 +70,27 @@ const AdminDashboard = () => {
       clearInterval(interval);
       import("../../../socket").then(({ socket }) => {
         socket.off("attendance_update", onAttendanceUpdate);
+        socket.off("idle_request_created", onIdleRequestCreated);
+        socket.off("idle_approval_update", onIdleApprovalUpdate);
       });
     };
   }, []);
+
+  const handleIdleApproval = async (idleId, approved) => {
+    try {
+      const adminId = localStorage.getItem("userId"); // Get admin ID from localStorage
+      await axios.post(`${API_BASE_URL}/admin/idle/approve/${idleId}`, {
+        approved,
+        adminId,
+      });
+      // Refresh the list
+      const res = await axios.get(`${API_BASE_URL}/admin/idle/pending`);
+      setPendingIdleRequests(res.data);
+    } catch (err) {
+      console.error("Error handling idle approval:", err);
+      alert(err.response?.data?.message || "Failed to process request");
+    }
+  };
 
   const stats = [
     {
@@ -101,8 +147,8 @@ const AdminDashboard = () => {
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Donut Chart */}
-        <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 lg:col-span-4">
+
+        {/* Donut Chart */}<div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 lg:col-span-4">
           <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 text-center">
             Activity Snapshot
           </h2>
@@ -160,6 +206,8 @@ const AdminDashboard = () => {
                   ["Offline Users", statsData.offline, "Inactive"],
                 ].map((row, i) => (
                   <tr key={i} className="hover:bg-blue-50/30 transition-colors">
+
+
                     <td className="p-4 font-bold text-blue-500">{row[0]}</td>
                     <td className="p-4 text-center font-black text-gray-800 text-lg">
                       {row[1]}
@@ -175,6 +223,94 @@ const AdminDashboard = () => {
             </table>
           </div>
         </div>
+      </div>
+      <div>
+        {pendingIdleRequests.length > 0 && (
+          <div className="mb-8">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                    ⚠️
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black text-gray-800 uppercase tracking-widest">
+                      Action Required
+                    </h2>
+                    <p className="text-xs text-gray-500 font-bold">Pending Idle Requests</p>
+                  </div>
+                </div>
+                <span className="px-4 py-1.5 bg-orange-500 text-white rounded-full text-xs font-black shadow-lg shadow-orange-500/30">
+                  {pendingIdleRequests.length} REQUESTS
+                </span>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-gray-100">
+                <table className="w-full text-sm text-gray-600">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-500 text-[11px] font-black uppercase tracking-wider">
+                      <th className="p-4 text-left">Employee</th>
+                      <th className="p-4 text-left">Details</th>
+                      <th className="p-4 text-left">Reason</th>
+                      <th className="p-4 text-center">Duration</th>
+                      <th className="p-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-gray-50 bg-white">
+                    {loadingIdle ? (
+                      <tr>
+                        <td colSpan={5} className="p-8 text-center text-gray-400 font-bold">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : (
+                      pendingIdleRequests.map((request) => (
+                        <tr key={request._id} className="hover:bg-orange-50/50 transition-colors group">
+                          <td className="p-4">
+                            <div className="font-black text-gray-800">{request.employeeName}</div>
+                            <div className="text-[10px] uppercase font-bold text-gray-400">{request.department}</div>
+                          </td>
+                          <td className="p-4 text-xs font-bold text-gray-400">
+                            {new Date(request.startTime).toLocaleTimeString()}
+                          </td>
+                          <td className="p-4 max-w-xs">
+                            <div className="bg-gray-50 p-2 rounded-lg border border-gray-100 text-xs font-bold text-gray-600 italic">
+                              "{request.reason}"
+                            </div>
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className="font-black text-lg text-orange-500">
+                              {Math.floor(request.duration / 60)}
+                            </span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase ml-1">min</span>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex gap-3 justify-center">
+                              <button
+                                onClick={() => handleIdleApproval(request._id, true)}
+                                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-black shadow-lg shadow-green-500/20 active:scale-95 transition-all cursor-pointer flex items-center gap-2"
+                              >
+                                <span>APPROVE</span>
+                              </button>
+                              <button
+                                onClick={() => handleIdleApproval(request._id, false)}
+                                className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl text-xs font-black active:scale-95 transition-all cursor-pointer"
+                              >
+                                REJECT
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

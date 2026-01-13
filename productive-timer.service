@@ -1,0 +1,14 @@
+[Unit]
+Description=Productive Timer Service
+After=network.target
+
+[Service]
+User=mernhosting
+WorkingDirectory=/home/mernhosting/Desktop/Productive Timer/ProductiveTimer/server
+ExecStart=/home/mernhosting/.nvm/versions/node/v20.19.6/bin/node server.js
+Restart=always
+Environment=NODE_ENV=production
+Environment=PORT=5000 
+
+[Install]
+WantedBy=multi-user.target

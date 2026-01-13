@@ -6,6 +6,7 @@ import {
   checkout,
   getActiveTimer,
   getActiveBreak,
+  getActiveIdle,
   getCurrentStatus,
   getStatsToday,
   getAllAttendanceAdmin,
@@ -15,6 +16,8 @@ import {
   getEmployeeReportStats,
   getMyAttendance,
   syncMachineAttendance,
+  startIdleTimer,
+  resumeFromIdle,
 } from "../Controller/attendanceController.js";
 
 const router = express.Router();
@@ -25,9 +28,12 @@ router.post("/timer/pause", pauseTimer);
 router.post("/timer/checkout", checkout);
 router.post("/timer/logout-stop", logoutStop);
 router.post("/attendance/sync", syncMachineAttendance);
+router.post("/timer/idle/start", startIdleTimer);
+router.post("/timer/idle/resume", resumeFromIdle);
 
 router.get("/timer/active/:employeeId", getActiveTimer);
 router.get("/break/active/:employeeId", getActiveBreak);
+router.get("/idle/active/:employeeId", getActiveIdle);
 router.get("/timer/status/:employeeId", getCurrentStatus);
 router.get("/stats/today/:employeeId", getStatsToday);
 router.get("/stats/week/:employeeId", getStatsWeek);

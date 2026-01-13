@@ -20,9 +20,10 @@ const attendanceSchema = new mongoose.Schema(
     lastCheckOut: { type: Date },
     workDuration: { type: Number, default: 0 }, // cumulative seconds
     breakDuration: { type: Number, default: 0 }, // cumulative seconds
+    idleDuration: { type: Number, default: 0 }, // cumulative idle seconds
     status: {
       type: String,
-      enum: ["working", "break", "none", "stopped", "checked-out", "leave"],
+      enum: ["working", "break", "idle", "none", "stopped", "checked-out", "leave"],
       default: "none",
     },
     lastStatusChange: { type: Date, default: Date.now },
