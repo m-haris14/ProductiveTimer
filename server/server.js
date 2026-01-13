@@ -1,6 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 import Employee from "./Model/employee.js";
 import employeeRoutes from "./Routes/employeeRoutes.js";
@@ -38,6 +44,8 @@ app.use(
 );
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
+app.use(express.static(path.join(__dirname, "../dist")));
+
 
 // Database Connection & Admin Initialization
 mongoose
@@ -73,8 +81,6 @@ mongoose
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // Routes
-app.get("/", (req, res) => res.send("ProductiveTimer Server Running"));
-
 app.use(employeeRoutes);
 app.use(attendanceRoutes);
 app.use(taskRoutes);
@@ -84,9 +90,16 @@ app.use(workHourRoutes);
 app.use(projectRoutes);
 app.use(adminRoutes);
 
-const PORT = 5000;
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
+});
+
+const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, "0.0.0.0", () =>
   console.log(
-    `✅ Server running on http://192.168.1.64:${PORT} (Socket.IO Enabled)`
+    `✅ Server running on http://192.168.1.231:${PORT} (Socket.IO Enabled)`
   )
 );
+

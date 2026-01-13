@@ -1,5 +1,5 @@
 // App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import { ConfirmProvider } from "./context/ConfirmContext";
@@ -105,9 +105,9 @@ export default function App() {
     <ToastProvider>
       <ConfirmProvider>
         <AuthProvider>
-          <BrowserRouter>
+          <HashRouter>
             <AppRoutes />
-          </BrowserRouter>
+          </HashRouter>
         </AuthProvider>
       </ConfirmProvider>
     </ToastProvider>
